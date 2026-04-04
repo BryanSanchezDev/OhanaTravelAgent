@@ -1,0 +1,13 @@
+{
+  "configurations": {
+    "ohana-travel-agent": {
+      "appLocation": ".",
+      "apiLocation": "api",
+      "outputLocation": "dist",
+      "appBuildCommand": "npm run build",
+      "run": "npm run dev",
+      "resourceGroup": "myResourceGroup",
+      "appName": "ohana-travel-agent"
+    }
+  }
+}

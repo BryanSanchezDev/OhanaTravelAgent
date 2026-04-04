@@ -1,0 +1,19 @@
+{
+  "routes": [
+    {
+      "route": "/api/chat",
+      "allowedRoles": ["approved-member"]
+    }
+  ],
+  "auth": {
+    "identityProviders": {
+      "google": {
+        "registration": {
+          "clientIdSettingName": "GOOGLE_CLIENT_ID",
+          "clientSecretSettingName": "GOOGLE_CLIENT_SECRET"
+        }
+      }
+    },
+    "rolesSource": "/api/get-roles"
+  }
+}
