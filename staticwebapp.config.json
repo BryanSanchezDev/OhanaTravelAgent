@@ -1,1 +1,1 @@
-{"routes":[{"route":"/api/get-roles","allowedRoles":["anonymous"]},{"route":"/api/chat","allowedRoles":["authenticated"]}],"navigationFallback":{"rewrite":"/index.html","exclude":["/api/*"]}}
+{"routes":[{"route":"/api/get-roles","allowedRoles":["anonymous"]},{"route":"/api/chat","allowedRoles":["authenticated"]}],"navigationFallback":{"rewrite":"/index.html","exclude":["/api/*"]},"auth":{"rolesSource":"/api/get-roles","identityProviders":{"google":{"registration":{"clientIdSettingName":"GOOGLE_CLIENT_ID","clientSecretSettingName":"GOOGLE_CLIENT_SECRET_APP_SETTING_NAME"}}}}}
