@@ -1,4 +1,15 @@
 {
+   "auth": {
+    "rolesSource": "/api/get-roles",
+    "identityProviders": {
+      "google": {
+        "registration": {
+          "clientIdSettingName": "GOOGLE_CLIENT_ID",
+          "clientSecretSettingName": "GOOGLE_CLIENT_SECRET_APP_SETTING_NAME"
+        }
+      }
+    }
+  }, 
   "routes": [
     {
       "route": "/api/get-roles",
@@ -12,16 +23,5 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/api/*"]
-  },
-  "auth": {
-    "identityProviders": {
-      "google": {
-        "registration": {
-          "clientIdSettingName": "GOOGLE_CLIENT_ID",
-          "clientSecretSettingName": "GOOGLE_CLIENT_SECRET_APP_SETTING_NAME"
-        }
-      }
-    },
-    "rolesSource": "/api/get-roles"
   }
 }
