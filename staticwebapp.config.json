@@ -9,6 +9,10 @@
       "allowedRoles": ["approved-member"]
     }
   ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*"]
+  },
   "auth": {
     "identityProviders": {
       "google": {
