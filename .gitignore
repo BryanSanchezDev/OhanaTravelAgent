@@ -16,6 +16,7 @@ dist-ssr
 .env*.local
 api/node_modules
 api/local.settings.json
+staticwebapp.config.local.json
 
 # Editor directories and files
 .vscode/*

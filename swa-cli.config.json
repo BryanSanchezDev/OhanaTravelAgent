@@ -6,7 +6,8 @@
       "outputLocation": "dist",
       "appBuildCommand": "npm run build",
       "run": "npm run dev",
-      "resourceGroup": "myResourceGroup",
+      "configFileLocation": "staticwebapp.config.local.json",
+      "resourceGroup": "rg-static-pages",
       "appName": "ohana-travel-agent"
     }
   }

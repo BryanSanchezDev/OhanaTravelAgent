@@ -1,19 +1,30 @@
 {
   "routes": [
     {
+      "route": "/.auth/login/google",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/.auth/logout",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/get-roles",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/api/chat",
+      "allowedRoles": ["approved-member"]
+    },
+    {
+      "route": "/*",
       "allowedRoles": ["approved-member"]
     }
   ],
-  "auth": {
-    "identityProviders": {
-      "google": {
-        "registration": {
-          "clientIdSettingName": "GOOGLE_CLIENT_ID",
-          "clientSecretSettingName": "GOOGLE_CLIENT_SECRET"
-        }
-      }
-    },
-    "rolesSource": "/api/get-roles"
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/google?post_login_redirect_uri=/",
+      "statusCode": 302
+    }
   }
 }
