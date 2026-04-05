@@ -14,14 +14,15 @@ export async function getRoles(
 
   try {
     const body = await request.json() as {
-      clientPrincipal: { userDetails: string } | null
+      clientPrincipal: { userDetails: string; identityProvider: string } | null
     }
 
     if (!body.clientPrincipal) {
-      return {
-        status: 200,
-        jsonBody: { roles: [] }
-      }
+      return { status: 200, jsonBody: { roles: [] } }
+    }
+
+    if (body.clientPrincipal.identityProvider !== 'google') {
+      return { status: 401, jsonBody: { roles: [] } }
     }
 
     const userEmail = body.clientPrincipal.userDetails.toLowerCase()
