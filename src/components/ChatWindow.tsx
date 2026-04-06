@@ -3,6 +3,7 @@ import MessageBubble, { TypingIndicator, type Message } from "./MessageBubble";
 interface ChatWindowProps {
   token: string;
   memberName: string;
+  onLogout: () => void;
 }
 
 const WELCOME_MESSAGE: Message = {
@@ -18,7 +19,7 @@ const SUGGESTED_PROMPTS = [
   "Find family-friendly resorts in Mexico",
 ];
 
-export default function ChatWindow({ token, memberName }: ChatWindowProps) {
+export default function ChatWindow({ token, memberName, onLogout }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -138,6 +139,14 @@ export default function ChatWindow({ token, memberName }: ChatWindowProps) {
               </div>
             </div>
           </div>
+
+          {/* Logout */}
+          <button
+            onClick={onLogout}
+            className="text-xs text-blue-200 hover:text-white transition-colors"
+          >
+            Sign out
+          </button>
         </div>
       </header>
 

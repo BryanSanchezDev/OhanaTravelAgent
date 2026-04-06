@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
 import { CosmosClient } from "@azure/cosmos"
 
@@ -20,13 +21,10 @@ export async function validateToken(
       }
     }
 
-    // Look up token in Cosmos DB
-    const query = {
+    const { resources } = await container.items.query({
       query: "SELECT * FROM c WHERE c.token = @token",
       parameters: [{ name: "@token", value: body.token }]
-    }
-
-    const { resources } = await container.items.query(query).fetchAll()
+    }).fetchAll()
 
     if (resources.length === 0) {
       return {
@@ -37,7 +35,6 @@ export async function validateToken(
 
     const tokenDoc = resources[0]
 
-    // Check if token is active
     if (!tokenDoc.active) {
       return {
         status: 200,
@@ -45,7 +42,13 @@ export async function validateToken(
       }
     }
 
-    // Check if token has expired
+    if (tokenDoc.used) {
+      return {
+        status: 200,
+        jsonBody: { valid: false, error: "This link has already been used" }
+      }
+    }
+
     if (new Date(tokenDoc.expiresAt) < new Date()) {
       return {
         status: 200,
@@ -53,11 +56,17 @@ export async function validateToken(
       }
     }
 
+    await container.items.upsert({
+      ...tokenDoc,
+      used: true,
+      usedAt: new Date().toISOString()
+    })
+
     return {
       status: 200,
       jsonBody: {
         valid: true,
-        memberName: tokenDoc.name,
+        name: tokenDoc.name,
         email: tokenDoc.email
       }
     }

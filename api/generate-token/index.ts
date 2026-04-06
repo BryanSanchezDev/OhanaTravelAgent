@@ -45,7 +45,9 @@ export async function generateToken(
       token,
       expiresAt: expiresAt.toISOString(),
       createdAt: new Date().toISOString(),
-      active: true
+      active: true,
+      used: false,
+      usedAt: null
     })
 
     // Build the magic link

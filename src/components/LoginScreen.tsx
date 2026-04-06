@@ -1,6 +1,6 @@
-export default function LoginScreen() {
+export default function LoginScreen({ errorMessage }: { errorMessage?: string }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-700 via-indigo-800 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-blue-700 via-indigo-800 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
 
       {/* Background decorative glows */}
       <div className="absolute inset-0 pointer-events-none">
@@ -42,6 +42,16 @@ export default function LoginScreen() {
               travel planning assistant
             </span>
           </h1>
+
+          {/* Error message box */}
+          {errorMessage && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-4 text-left">
+              <div className="flex gap-3">
+                <span className="text-xl mt-0.5">💡</span>
+                <p className="text-sm text-amber-800 leading-relaxed">{errorMessage}</p>
+              </div>
+            </div>
+          )}
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
