@@ -54,7 +54,7 @@ export async function generateToken(
 
     // Send the email via Resend
     await resend.emails.send({
-      from: "Bella <onboarding@resend.dev>",
+      from: "Bella <mail.bryansanchez.dev>",
       to: body.email,
       subject: "Your access to Ohana Travel Agent 🧳",
       html: `
