@@ -7,8 +7,16 @@
     "sourceMap": true,
     "strict": false,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["es6"],
+    "types": ["node"]
   },
-  "include": ["*.ts", "chat/*.ts", "get-roles/*.ts"],
+  "include": [
+    "*.ts",
+    "chat/*.ts",
+    "get-roles/*.ts",
+    "generate-token/*.ts",
+    "validate-token/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

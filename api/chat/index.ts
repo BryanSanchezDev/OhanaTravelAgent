@@ -1,12 +1,17 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
 import Anthropic from "@anthropic-ai/sdk"
+import { CosmosClient } from "@azure/cosmos"
 
-const TRAVEL_AGENT_PROMPT = `You are Maya, an expert family travel agent 
+const cosmosClient = new CosmosClient(process.env.COSMOS_CONNECTION_STRING || "")
+const database = cosmosClient.database("ohana-db")
+const container = database.container("tokens")
+
+const TRAVEL_AGENT_PROMPT = `You are Bella, an expert family travel agent 
 with 15 years of experience. Your job is to ask the right questions ONE 
 AT A TIME to build the perfect family travel itinerary.
 
 Follow this order:
-1. Warm greeting, then ask for destination or if they need suggestions
+1. Warm greeting using the member's first name, then ask for destination or if they need suggestions
 2. Travel dates and trip duration
 3. Number of adults and children (and ages of children)
 4. Total budget range
@@ -37,6 +42,31 @@ export async function chat(
   try {
     const body = await request.json() as {
       messages: Array<{ role: "user" | "assistant"; content: string }>
+      token: string
+    }
+
+    // Validate token against Cosmos DB
+    const query = {
+      query: "SELECT * FROM c WHERE c.token = @token AND c.active = true",
+      parameters: [{ name: "@token", value: body.token }]
+    }
+
+    const { resources } = await container.items.query(query).fetchAll()
+
+    if (resources.length === 0) {
+      return {
+        status: 401,
+        jsonBody: { error: "Invalid or expired access link." }
+      }
+    }
+
+    const tokenDoc = resources[0]
+
+    if (new Date(tokenDoc.expiresAt) < new Date()) {
+      return {
+        status: 401,
+        jsonBody: { error: "Your access link has expired." }
+      }
     }
 
     const response = await client.messages.create({

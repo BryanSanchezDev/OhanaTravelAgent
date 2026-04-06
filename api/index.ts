@@ -1,2 +1,3 @@
 import './chat/index'
-import './get-roles/index'
+import './generate-token/index'
+import './validate-token/index'

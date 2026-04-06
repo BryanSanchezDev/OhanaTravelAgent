@@ -2,54 +2,41 @@ import { useState, useEffect } from 'react'
 import ChatWindow from './components/ChatWindow'
 import LoginScreen from './components/LoginScreen'
 
-export interface AuthUser {
-  userId: string
-  userDetails: string
-  userRoles: string[]
-  identityProvider: string
-}
-
-interface AuthResponse {
-  clientPrincipal: AuthUser | null
-}
+type AuthState = 'loading' | 'valid' | 'invalid'
 
 function App() {
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const [authLoading, setAuthLoading] = useState(true)
-  const [unauthorized, setUnauthorized] = useState(false)
+  const [authState, setAuthState] = useState<AuthState>('loading')
+  const [token, setToken] = useState<string | null>(null)
+  const [memberName, setMemberName] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/.auth/me')
+    const params = new URLSearchParams(window.location.search)
+    const urlToken = params.get('token')
+
+    if (!urlToken) {
+      setAuthState('invalid')
+      return
+    }
+
+    fetch('/api/validate-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: urlToken }),
+    })
       .then(res => res.json())
-      .then(async (data: AuthResponse) => {
-        const principal = data.clientPrincipal
-        if (!principal) {
-          setUser(null)
-          return
-        }
-        // SWA CLI emulator doesn't inject custom roles into /.auth/me locally,
-        // so we call get-roles directly to check membership.
-        if (principal.userRoles.includes('approved-member')) {
-          setUser(principal)
-          return
-        }
-        const rolesRes = await fetch('/api/get-roles', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientPrincipal: principal }),
-        })
-        const rolesData = await rolesRes.json()
-        if (rolesData.roles?.includes('approved-member')) {
-          setUser(principal)
+      .then(data => {
+        if (data.valid) {
+          setToken(urlToken)
+          setMemberName(data.memberName ?? null)
+          setAuthState('valid')
         } else {
-          setUnauthorized(true)
+          setAuthState('invalid')
         }
       })
-      .catch(() => setUser(null))
-      .finally(() => setAuthLoading(false))
+      .catch(() => setAuthState('invalid'))
   }, [])
 
-  if (authLoading) {
+  if (authState === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -64,11 +51,11 @@ function App() {
     )
   }
 
-  if (!user || unauthorized) {
-    return <LoginScreen unauthorized={unauthorized} />
+  if (authState === 'invalid') {
+    return <LoginScreen />
   }
 
-  return <ChatWindow user={user} />
+  return <ChatWindow token={token!} memberName={memberName ?? ''} />
 }
 
 export default App

@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import MessageBubble, { TypingIndicator, type Message } from "./MessageBubble";
-import type { AuthUser } from "../App";
-
 interface ChatWindowProps {
-  user: AuthUser;
+  token: string;
+  memberName: string;
 }
 
 const WELCOME_MESSAGE: Message = {
@@ -19,10 +18,11 @@ const SUGGESTED_PROMPTS = [
   "Find family-friendly resorts in Mexico",
 ];
 
-export default function ChatWindow({ user }: ChatWindowProps) {
+export default function ChatWindow({ token, memberName }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [invalidToken, setInvalidToken] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -45,6 +45,7 @@ export default function ChatWindow({ user }: ChatWindowProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          token,
           messages: updatedMessages.map((m) => ({
             role: m.role,
             content: m.content,
@@ -52,6 +53,10 @@ export default function ChatWindow({ user }: ChatWindowProps) {
         }),
       });
 
+      if (res.status === 401) {
+        setInvalidToken(true);
+        return;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
@@ -94,6 +99,23 @@ export default function ChatWindow({ user }: ChatWindowProps) {
 
   const showSuggestions = messages.length === 1;
 
+  if (invalidToken) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-10 max-w-md w-full text-center">
+          <div className="text-5xl mb-4">🔒</div>
+          <h2 className="text-xl font-bold text-slate-800 mb-3">
+            Link no longer valid
+          </h2>
+          <p className="text-slate-500 leading-relaxed">
+            Your access link is invalid. Please use the original link from your
+            email.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50">
       {/* Header */}
@@ -105,7 +127,9 @@ export default function ChatWindow({ user }: ChatWindowProps) {
               🧳
             </div>
             <div>
-              <h1 className="font-bold text-base leading-tight">Bella</h1>
+              <h1 className="font-bold text-base leading-tight">
+                Hi {memberName}! I'm Bella 🧳
+              </h1>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
                 <span className="text-xs text-blue-200">
@@ -113,32 +137,6 @@ export default function ChatWindow({ user }: ChatWindowProps) {
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* User + logout */}
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:block text-xs text-blue-200 max-w-96 truncate">
-              {user.userDetails}
-            </span>
-            <a
-              href="/.auth/logout"
-              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors duration-200"
-            >
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              <span>Sign out</span>
-            </a>
           </div>
         </div>
       </header>
