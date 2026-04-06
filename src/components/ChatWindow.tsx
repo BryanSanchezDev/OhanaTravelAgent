@@ -19,7 +19,11 @@ const SUGGESTED_PROMPTS = [
   "Find family-friendly resorts in Mexico",
 ];
 
-export default function ChatWindow({ token, memberName, onLogout }: ChatWindowProps) {
+export default function ChatWindow({
+  token,
+  memberName,
+  onLogout,
+}: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +147,7 @@ export default function ChatWindow({ token, memberName, onLogout }: ChatWindowPr
           {/* Logout */}
           <button
             onClick={onLogout}
-            className="text-xs text-blue-200 hover:text-white transition-colors"
+            className="text-xs font-medium text-blue-100 bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-lg transition-colors"
           >
             Sign out
           </button>
@@ -209,7 +213,7 @@ export default function ChatWindow({ token, memberName, onLogout }: ChatWindowPr
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="shrink-0 w-11 h-11 bg-gradient-to-br from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 disabled:from-slate-200 disabled:to-slate-300 disabled:cursor-not-allowed text-white rounded-2xl flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200"
+              className="shrink-0 w-11 h-11 mb-2 bg-gradient-to-br from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 disabled:from-slate-200 disabled:to-slate-300 disabled:cursor-not-allowed text-white rounded-2xl flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200"
               aria-label="Send message"
             >
               <svg
