@@ -20,8 +20,8 @@ export default function LoginScreen({ errorMessage }: { errorMessage?: string })
       </div>
 
       {/* Card */}
-      <div className="relative w-full max-w-md">
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-900/30 px-8 py-10 text-center">
+      <div className="relative w-full max-w-md mx-6">
+        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-900/30 px-8 py-8 text-center">
 
           {/* Avatar */}
           <div className="flex justify-center mb-5">
@@ -54,11 +54,7 @@ export default function LoginScreen({ errorMessage }: { errorMessage?: string })
           )}
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent to-slate-200" />
-            <span className="text-slate-300 text-sm">🌺</span>
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent to-slate-200" />
-          </div>
+          <div className="h-px bg-slate-200 my-5" />
 
           {/* Access message */}
           <div className="bg-gradient-to-br from-sky-50 to-blue-50 border border-blue-100 rounded-2xl p-5 text-left">
