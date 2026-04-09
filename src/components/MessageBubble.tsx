@@ -25,8 +25,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div className="message-bubble flex items-end gap-2.5 mb-4">
       {/* Bella avatar */}
-      <div className="shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm text-base">
-        🧳
+      <div className="shrink-0 w-8 h-8 rounded-full overflow-hidden shadow-sm">
+        <img src="/OhanaTravelIcon.png" alt="Bella" className="w-full h-full object-cover" />
       </div>
       <div className="max-w-[75%] sm:max-w-[65%]">
         <p className="text-xs text-slate-400 font-medium mb-1 pl-1">Bella</p>
@@ -41,8 +41,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 export function TypingIndicator() {
   return (
     <div className="message-bubble flex items-end gap-2.5 mb-4">
-      <div className="shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm text-base">
-        🧳
+      <div className="shrink-0 w-8 h-8 rounded-full overflow-hidden shadow-sm">
+        <img src="/OhanaTravelIcon.png" alt="Bella" className="w-full h-full object-cover" />
       </div>
       <div>
         <p className="text-xs text-slate-400 font-medium mb-1 pl-1">Bella</p>

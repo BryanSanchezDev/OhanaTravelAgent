@@ -25,8 +25,8 @@ export default function LoginScreen({ errorMessage }: { errorMessage?: string })
 
           {/* Avatar */}
           <div className="flex justify-center mb-5">
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-300/40 rotate-3">
-              <span className="text-4xl -rotate-3">🧳</span>
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-orange-300/40 rotate-3">
+              <img src="/OhanaTravelIcon.png" alt="Bella" className="w-full h-full object-cover -rotate-3" />
             </div>
           </div>
 

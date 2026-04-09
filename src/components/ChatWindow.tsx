@@ -128,8 +128,8 @@ export default function ChatWindow({
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Bella info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl shadow-inner">
-              🧳
+            <div className="w-10 h-10 rounded-full overflow-hidden shadow-inner">
+              <img src="/OhanaTravelIcon.png" alt="Bella" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="font-bold text-base leading-tight">
