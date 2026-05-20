@@ -1,14 +1,23 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import Anthropic from "@anthropic-ai/sdk"
-import { CosmosClient } from "@azure/cosmos"
+import {
+  app,
+  HttpRequest,
+  HttpResponseInit,
+  InvocationContext,
+} from "@azure/functions";
+import Anthropic from "@anthropic-ai/sdk";
+import { CosmosClient } from "@azure/cosmos";
 
-const cosmosClient = new CosmosClient(process.env.COSMOS_CONNECTION_STRING || "")
-const database = cosmosClient.database("ohana-db")
-const container = database.container("tokens")
+const cosmosClient = new CosmosClient(
+  process.env.COSMOS_CONNECTION_STRING || "",
+);
+const database = cosmosClient.database("ohana-db");
+const container = database.container("tokens");
 
-const TRAVEL_AGENT_PROMPT = `You are Bella, an expert family travel agent 
-with 15 years of experience. Your job is to ask the right questions ONE 
+const TRAVEL_AGENT_PROMPT = `You are Bella, an expert family travel agent
+with 15 years of experience. Your job is to ask the right questions ONE
 AT A TIME to build the perfect family travel itinerary.
+
+IMPORTANT: You only help with travel-related topics. If the user asks about anything unrelated to travel — including but not limited to math, politics, history, science, technology, entertainment, or general knowledge — politely decline and redirect them. For example: "I'm only able to help with travel planning! Let's get back to planning your perfect trip. 🧳"
 
 Follow this order:
 1. Warm greeting using the member's first name, then ask for destination or if they need suggestions
@@ -27,46 +36,45 @@ After collecting all info, generate a detailed day-by-day itinerary with:
 - Practical tips for traveling with kids of those ages
 - Packing suggestions
 
-Be warm, friendly and use emojis occasionally. 
-Keep questions conversational, not clinical.`
+Be warm, friendly and use emojis occasionally.
+Keep questions conversational, not clinical.`;
 
 export async function chat(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
-
   const client = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY
-  })
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
 
   try {
-    const body = await request.json() as {
-      messages: Array<{ role: "user" | "assistant"; content: string }>
-      token: string
-    }
+    const body = (await request.json()) as {
+      messages: Array<{ role: "user" | "assistant"; content: string }>;
+      token: string;
+    };
 
     // Validate token against Cosmos DB
     const query = {
       query: "SELECT * FROM c WHERE c.token = @token AND c.active = true",
-      parameters: [{ name: "@token", value: body.token }]
-    }
+      parameters: [{ name: "@token", value: body.token }],
+    };
 
-    const { resources } = await container.items.query(query).fetchAll()
+    const { resources } = await container.items.query(query).fetchAll();
 
     if (resources.length === 0) {
       return {
         status: 401,
-        jsonBody: { error: "Invalid or expired access link." }
-      }
+        jsonBody: { error: "Invalid or expired access link." },
+      };
     }
 
-    const tokenDoc = resources[0]
+    const tokenDoc = resources[0];
 
     if (new Date(tokenDoc.expiresAt) < new Date()) {
       return {
         status: 401,
-        jsonBody: { error: "Your access link has expired." }
-      }
+        jsonBody: { error: "Your access link has expired." },
+      };
     }
 
     const response = await client.messages.create({
@@ -74,25 +82,24 @@ export async function chat(
       max_tokens: 1024,
       system: TRAVEL_AGENT_PROMPT,
       messages: body.messages,
-    })
+    });
 
     return {
       status: 200,
       headers: { "Content-Type": "application/json" },
-      jsonBody: response
-    }
-
+      jsonBody: response,
+    };
   } catch (error) {
-    context.log("Error calling Anthropic API:", error)
+    context.log("Error calling Anthropic API:", error);
     return {
       status: 500,
-      jsonBody: { error: "Something went wrong. Please try again." }
-    }
+      jsonBody: { error: "Something went wrong. Please try again." },
+    };
   }
 }
 
 app.http("chat", {
   methods: ["POST"],
   authLevel: "anonymous",
-  handler: chat
-})
+  handler: chat,
+});
