@@ -97,7 +97,7 @@ export async function generateToken(
     context.log("Error generating token:", error)
     return {
       status: 500,
-      jsonBody: { error: "Failed to generate magic link" }
+      jsonBody: { error: "Failed to generate magic link", detail: String(error) }
     }
   }
 }
