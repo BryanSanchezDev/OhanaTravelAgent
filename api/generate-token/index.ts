@@ -1,41 +1,47 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { CosmosClient } from "@azure/cosmos"
-import { Resend } from "resend"
-import { randomBytes } from "node:crypto"
+import {
+  app,
+  HttpRequest,
+  HttpResponseInit,
+  InvocationContext,
+} from "@azure/functions";
+import { CosmosClient } from "@azure/cosmos";
+import { Resend } from "resend";
+import { randomBytes } from "node:crypto";
 
-const cosmosClient = new CosmosClient(process.env.COSMOS_CONNECTION_STRING || "")
-const resend = new Resend(process.env.RESEND_API_KEY || "")
+const cosmosClient = new CosmosClient(
+  process.env.COSMOS_CONNECTION_STRING || "",
+);
+const resend = new Resend(process.env.RESEND_API_KEY || "");
 
-const database = cosmosClient.database("ohana-db")
-const container = database.container("tokens")
+const database = cosmosClient.database("ohana-db");
+const container = database.container("tokens");
 
 export async function generateToken(
   request: HttpRequest,
-  context: InvocationContext
+  context: InvocationContext,
 ): Promise<HttpResponseInit> {
-
   // Protect this endpoint — only you can call it
-  const adminKey = request.headers.get("x-admin-key")
+  const adminKey = request.headers.get("x-admin-key");
   if (adminKey !== process.env.ADMIN_KEY) {
-    return { status: 401, jsonBody: { error: "Unauthorized" } }
+    return { status: 401, jsonBody: { error: "Unauthorized" } };
   }
 
   try {
-    const body = await request.json() as { email: string; name: string }
+    const body = (await request.json()) as { email: string; name: string };
 
     if (!body.email || !body.name) {
       return {
         status: 400,
-        jsonBody: { error: "Email and name are required" }
-      }
+        jsonBody: { error: "Email and name are required" },
+      };
     }
 
     // Generate a secure random token
-    const token = randomBytes(32).toString("hex")
+    const token = randomBytes(32).toString("hex");
 
     // Set expiry to 1 year from now
-    const expiresAt = new Date()
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+    const expiresAt = new Date();
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
 
     // Store token in Cosmos DB
     await container.items.upsert({
@@ -47,16 +53,16 @@ export async function generateToken(
       createdAt: new Date().toISOString(),
       active: true,
       used: false,
-      usedAt: null
-    })
+      usedAt: null,
+    });
 
     // Build the magic link
-    const appUrl = process.env.APP_URL || "http://localhost:4280"
-    const magicLink = `${appUrl}?token=${token}`
+    const appUrl = process.env.APP_URL || "http://localhost:4280";
+    const magicLink = `${appUrl}?token=${token}`;
 
     // Send the email via Resend
     await resend.emails.send({
-      from: "Bella <onboarding@mail.bryansanchez.dev>",
+      from: "Bella <onboarding@mail.ohanatravel.net>",
       to: body.email,
       subject: "Your access to Ohana Travel Agent 🧳",
       html: `
@@ -82,28 +88,30 @@ export async function generateToken(
             <a href="${magicLink}" style="color: #1e40af;">${magicLink}</a>
           </p>
         </div>
-      `
-    })
+      `,
+    });
 
     return {
       status: 200,
       jsonBody: {
         message: `Magic link sent to ${body.email}`,
-        magicLink // Also returned so you can copy it manually if needed
-      }
-    }
-
+        magicLink, // Also returned so you can copy it manually if needed
+      },
+    };
   } catch (error) {
-    context.log("Error generating token:", error)
+    context.log("Error generating token:", error);
     return {
       status: 500,
-      jsonBody: { error: "Failed to generate magic link", detail: String(error) }
-    }
+      jsonBody: {
+        error: "Failed to generate magic link",
+        detail: String(error),
+      },
+    };
   }
 }
 
 app.http("generate-token", {
   methods: ["POST"],
   authLevel: "anonymous",
-  handler: generateToken
-})
+  handler: generateToken,
+});
