@@ -59,6 +59,13 @@ export default function ChatWindow({
       });
 
       if (res.status === 401) {
+        // Drop the rejected token so a stale one can't trap the user
+        try {
+          localStorage.removeItem("ohana_token");
+          localStorage.removeItem("ohana_member_name");
+        } catch {
+          // storage unavailable
+        }
         setInvalidToken(true);
         return;
       }
